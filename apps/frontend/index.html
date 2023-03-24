@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Product Catalog</title>
+  </head>
+  <body>
+    <h1>Product Catalog</h1>
+    <ul id="productList"></ul>
+    <form>
+      <label for="productId">Product ID:</label>
+      <input type="text" id="productId" name="productId">
+      <button type="submit">Get Product</button>
+    </form>
+    <div id="productDetails"></div>
+
+    <script>
+      // Select the DOM elements we need to work with
+      const productList = document.getElementById('productList');
+      const productDetails = document.getElementById('productDetails');
+      const form = document.querySelector('form');
+
+      // Add event listener to the form submit button
+      form.addEventListener('submit', (event) => {
+        event.preventDefault(); // Prevent the form from submitting normally
+        const productId = document.getElementById('productId').value;
+        getProduct(productId);
+      });
+
+      // Function to fetch a product by ID and display its details
+      function getProduct(productId) {
+        fetch(`/api/products/${productId}`) // Make a GET request to the server's API endpoint for products
+          .then(response => {
+            if (!response.ok) { // If the response indicates a problem (e.g. 404 Not Found), throw an error
+              throw new Error('Product not found');
+            }
+            return response.json(); // Otherwise, parse the response as JSON and return it
+          })
+          .then(product => { // Once the response has been parsed, display the product details on the page
+            productDetails.innerHTML = `
+              <h2>${product.name}</h2>
+              <p>ID: ${product.id}</p>
+            `;
+          })
+          .catch(error => { // If an error was thrown during the fetch, display it on the page
+            productDetails.innerHTML = `<p>${error.message}</p>`;
+          });
+      }
+    </script>
+  </body>
+</html>
